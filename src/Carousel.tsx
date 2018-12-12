@@ -1,20 +1,12 @@
 import React, { Component } from "react";
+import Img from "./Img";
 
 interface Props {
   FB: fb.FacebookStatic;
 }
 
-interface Image {
-  source: string;
-}
-
-interface Photo {
-  id: string;
-  images: Array<Image>;
-}
-
 export default class Carousel extends Component<Props> {
-  state = { photos: [] as Photo[] };
+  state = { photos: [] as pf.Photo[] };
 
   componentDidMount() {
     this.fetchPhotos();
@@ -28,8 +20,7 @@ export default class Carousel extends Component<Props> {
 
   render() {
     return this.state.photos.map(photo => {
-      const url = photo.images[0].source;
-      return <img key={photo.id} src={url} />;
+      return <Img key={photo.id} photo={photo} />;
     });
   }
 }

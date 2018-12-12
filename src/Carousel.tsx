@@ -19,8 +19,9 @@ export default class Carousel extends Component<Props> {
   }
 
   render() {
-    return this.state.photos.map(photo => {
-      return <Img key={photo.id} photo={photo} />;
-    });
+    const photo = this.state.photos.length ? (
+      <Img photo={this.state.photos[0]} />
+    ) : null;
+    return <div className="carousel">{photo}</div>;
   }
 }

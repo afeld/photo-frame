@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Carousel from "./Carousel";
 import FBLogin from "./FBLogin";
 import "./App.css";
 
@@ -21,7 +22,6 @@ class App extends Component<Props> {
   }
 
   onLogin = (response: fb.StatusResponse) => {
-    console.log(response);
     if (response.status === "connected") {
       this.setState({ loggedIn: true });
     }
@@ -29,7 +29,7 @@ class App extends Component<Props> {
 
   render() {
     const login = this.state.loggedIn ? (
-      "Logged in!"
+      <Carousel FB={this.props.FB} />
     ) : (
       <FBLogin FB={this.props.FB} onLoggedIn={this.onLogin} />
     );

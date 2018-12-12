@@ -9,11 +9,12 @@ interface Image {
 }
 
 interface Photo {
+  id: string;
   images: Array<Image>;
 }
 
 export default class Carousel extends Component<Props> {
-  state = { photoUrls: [] };
+  state = { photos: [] as Photo[] };
 
   componentDidMount() {
     this.fetchPhotos();
@@ -21,15 +22,14 @@ export default class Carousel extends Component<Props> {
 
   fetchPhotos() {
     this.props.FB.api("me/photos", { fields: "images" }, (response: any) => {
-      console.log(response);
-      const images = response.data.map(
-        (photo: Photo) => photo.images[0].source
-      );
-      this.setState({ photoUrls: images });
+      this.setState({ photos: response.data });
     });
   }
 
   render() {
-    return this.state.photoUrls.map(url => <img src={url} />);
+    return this.state.photos.map(photo => {
+      const url = photo.images[0].source;
+      return <img key={photo.id} src={url} />;
+    });
   }
 }

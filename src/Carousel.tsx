@@ -14,6 +14,8 @@ interface PhotosResponse {
   data: pf.Photo[];
 }
 
+const DELAY = 30 * 1000; // ms
+
 export default class Carousel extends Component<Props, State> {
   // https://stackoverflow.com/a/51305453/358804
   state: Readonly<State> = {
@@ -31,6 +33,7 @@ export default class Carousel extends Component<Props, State> {
       (response: PhotosResponse) => {
         this.setState({ photos: response.data });
         this.pickPhoto();
+        setInterval(this.pickPhoto.bind(this), DELAY);
       }
     );
   }

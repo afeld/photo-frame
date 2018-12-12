@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import FBLogin from "./FBLogin";
-import logo from "./logo.svg";
 import "./App.css";
 
 interface Props {
@@ -29,29 +28,13 @@ class App extends Component<Props> {
   };
 
   render() {
-    const login = this.state.loggedIn ? null : (
+    const login = this.state.loggedIn ? (
+      "Logged in!"
+    ) : (
       <FBLogin FB={this.props.FB} onLoggedIn={this.onLogin} />
     );
 
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {login}
-        </header>
-      </div>
-    );
+    return <div className="App">{login}</div>;
   }
 }
 

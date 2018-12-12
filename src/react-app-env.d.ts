@@ -2,7 +2,9 @@
 
 declare namespace pf {
   interface Image {
+    height: number;
     source: string;
+    width: number;
   }
 
   interface Photo {

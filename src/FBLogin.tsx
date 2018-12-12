@@ -11,7 +11,7 @@ interface Props {
 
 export default class FBLogin extends Component<Props> {
   onClick = () => {
-    this.props.FB.login(this.props.onLoggedIn, { scope: "user_photo" });
+    this.props.FB.login(this.props.onLoggedIn, { scope: "user_photos" });
   };
 
   render() {

@@ -5,6 +5,10 @@ interface Props {
   FB: fb.FacebookStatic;
 }
 
+interface PhotosResponse {
+  data: pf.Photo[];
+}
+
 export default class Carousel extends Component<Props> {
   state = { photos: [] as pf.Photo[] };
 
@@ -13,9 +17,13 @@ export default class Carousel extends Component<Props> {
   }
 
   fetchPhotos() {
-    this.props.FB.api("me/photos", { fields: "images" }, (response: any) => {
-      this.setState({ photos: response.data });
-    });
+    this.props.FB.api(
+      "me/photos",
+      { fields: "webp_images" },
+      (response: PhotosResponse) => {
+        this.setState({ photos: response.data });
+      }
+    );
   }
 
   render() {

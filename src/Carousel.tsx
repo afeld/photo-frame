@@ -29,7 +29,7 @@ export default class Carousel extends Component<Props, State> {
   fetchPhotos() {
     this.props.FB.api(
       "me/photos",
-      { fields: "webp_images" },
+      { fields: "name,webp_images" },
       (response: PhotosResponse) => {
         this.setState({ photos: response.data });
         this.pickPhoto();

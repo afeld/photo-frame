@@ -7,7 +7,8 @@ interface Props {
 
 export default class Img extends Component<Props> {
   render() {
-    const url = this.props.photo.webp_images[0].source;
-    return <img className="img" src={url} />;
+    const photo = this.props.photo;
+    const url = photo.webp_images[0].source;
+    return <img alt={photo.name} className="img" src={url} />;
   }
 }

@@ -7,6 +7,7 @@ declare namespace pf {
 
   interface Photo {
     id: string;
+    name?: string;
     webp_images: Array<Image>;
   }
 }

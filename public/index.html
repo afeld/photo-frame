@@ -23,32 +23,12 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>React App</title>
+    <!--
+      load synchonously, since it's required for the app and it's more complicated to load async
+    -->
+    <script src="https://connect.facebook.net/en_US/sdk.js"></script>
   </head>
   <body>
-    <script>
-      window.fbAsyncInit = function() {
-        FB.init({
-          appId: "301045530751709",
-          cookie: true,
-          xfbml: true,
-          version: "v3.2"
-        });
-
-        FB.AppEvents.logPageView();
-      };
-
-      (function(d, s, id) {
-        var js,
-          fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) {
-          return;
-        }
-        js = d.createElement(s);
-        js.id = id;
-        js.src = "https://connect.facebook.net/en_US/sdk.js";
-        fjs.parentNode.insertBefore(js, fjs);
-      })(document, "script", "facebook-jssdk");
-    </script>
     <noscript> You need to enable JavaScript to run this app. </noscript>
     <div id="root"></div>
     <!--

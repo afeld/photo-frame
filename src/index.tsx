@@ -4,6 +4,14 @@ import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 
+FB.init({
+  appId: "301045530751709",
+  status: true,
+  version: "v3.2"
+});
+
+FB.AppEvents.logPageView();
+
 FB.getLoginStatus(function(response) {
   console.log(response);
 });

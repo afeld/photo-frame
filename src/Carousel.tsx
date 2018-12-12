@@ -5,12 +5,20 @@ interface Props {
   FB: fb.FacebookStatic;
 }
 
+interface State {
+  displayedPhoto?: pf.Photo;
+  photos: pf.Photo[];
+}
+
 interface PhotosResponse {
   data: pf.Photo[];
 }
 
-export default class Carousel extends Component<Props> {
-  state = { photos: [] as pf.Photo[] };
+export default class Carousel extends Component<Props, State> {
+  // https://stackoverflow.com/a/51305453/358804
+  state: Readonly<State> = {
+    photos: []
+  };
 
   componentDidMount() {
     this.fetchPhotos();
@@ -22,14 +30,22 @@ export default class Carousel extends Component<Props> {
       { fields: "webp_images" },
       (response: PhotosResponse) => {
         this.setState({ photos: response.data });
+        this.pickPhoto();
       }
     );
   }
 
+  pickPhoto() {
+    const photos = this.state.photos;
+    const index = Math.floor(Math.random() * photos.length);
+    const photo = photos[index];
+    this.setState({ displayedPhoto: photo });
+  }
+
   render() {
-    const photo = this.state.photos.length ? (
-      <Img photo={this.state.photos[0]} />
+    const img = this.state.displayedPhoto ? (
+      <Img photo={this.state.displayedPhoto} />
     ) : null;
-    return <div className="carousel">{photo}</div>;
+    return <div className="carousel">{img}</div>;
   }
 }

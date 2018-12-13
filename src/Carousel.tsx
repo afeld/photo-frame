@@ -86,7 +86,10 @@ export default class Carousel extends Component<Props, State> {
           href="#"
           onClick={this.toggleFullscreen}
         >
-          <i className="fas fa-expand-arrows-alt" title="Toggle fullscreen" />
+          <i
+            className="fas fa-expand-arrows-alt fa-lg"
+            title="Toggle fullscreen"
+          />
         </a>
         {img}
       </div>

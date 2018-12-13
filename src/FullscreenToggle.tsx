@@ -31,6 +31,10 @@ export default class FullscreenToggle extends Component<Props> {
   };
 
   render() {
+    if (!document.fullscreenEnabled) {
+      // not supported
+      return null;
+    }
     return (
       <a className="fullscreen-toggle" href="#" onClick={this.onClick}>
         <i

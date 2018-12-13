@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import shuffle from "lodash.shuffle";
 import Img from "./Img";
+import FullscreenToggle from "./FullscreenToggle";
 import "./Carousel.css";
 
 interface Props {
@@ -14,13 +15,6 @@ interface State {
 
 interface PhotosResponse {
   data: pf.Photo[];
-}
-
-// https://github.com/Microsoft/TSJS-lib-generator/pull/597
-declare global {
-  interface Document {
-    fullscreenElement: Element | null;
-  }
 }
 
 const DELAY = 30 * 1000; // ms
@@ -73,23 +67,6 @@ export default class Carousel extends Component<Props, State> {
     }
   }
 
-  toggleFullscreen = () => {
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-    } else {
-      const carouselEl = this.wrapperRef.current;
-      if (carouselEl) {
-        carouselEl.requestFullscreen().catch(err => {
-          alert(
-            `Error attempting to enable full-screen mode: ${err.message} (${
-              err.name
-            })`
-          );
-        });
-      }
-    }
-  };
-
   img() {
     if (this.state.currentPhoto === undefined) {
       return null;
@@ -110,16 +87,7 @@ export default class Carousel extends Component<Props, State> {
   render() {
     return (
       <div className="carousel" ref={this.wrapperRef}>
-        <a
-          className="fullscreen-toggle"
-          href="#"
-          onClick={this.toggleFullscreen}
-        >
-          <i
-            className="fas fa-expand-arrows-alt fa-lg"
-            title="Toggle fullscreen"
-          />
-        </a>
+        <FullscreenToggle wrapperRef={this.wrapperRef} />
         {this.img()}
         {this.preloader()}
       </div>

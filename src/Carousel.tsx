@@ -79,11 +79,14 @@ export default class Carousel extends Component<Props, State> {
     }
   };
 
+  img() {
+    if (this.state.currentPhoto === undefined) {
+      return null;
+    }
+    return <Img photo={this.state.photos[this.state.currentPhoto]} />;
+  }
+
   render() {
-    const img =
-      this.state.currentPhoto === undefined ? null : (
-        <Img photo={this.state.photos[this.state.currentPhoto]} />
-      );
     return (
       <div className="carousel" ref={this.wrapperRef}>
         <a
@@ -96,7 +99,7 @@ export default class Carousel extends Component<Props, State> {
             title="Toggle fullscreen"
           />
         </a>
-        {img}
+        {this.img()}
       </div>
     );
   }

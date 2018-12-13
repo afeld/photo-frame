@@ -12,7 +12,7 @@ declare global {
 }
 
 export default class FullscreenToggle extends Component<Props> {
-  toggleFullscreen = () => {
+  onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (document.fullscreenElement) {
       document.exitFullscreen();
     } else {
@@ -27,11 +27,12 @@ export default class FullscreenToggle extends Component<Props> {
         });
       }
     }
+    event.preventDefault();
   };
 
   render() {
     return (
-      <a className="fullscreen-toggle" href="#" onClick={this.toggleFullscreen}>
+      <a className="fullscreen-toggle" href="#" onClick={this.onClick}>
         <i
           className="fas fa-expand-arrows-alt fa-lg"
           title="Toggle fullscreen"

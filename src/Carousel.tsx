@@ -53,8 +53,13 @@ export default class Carousel extends Component<Props, State> {
   }
 
   advance() {
-    const current = this.state.currentPhoto || 0;
-    this.setState({ currentPhoto: current + 1 });
+    let currentPhoto = this.state.currentPhoto || 0;
+    currentPhoto += 1;
+    if (currentPhoto >= this.state.photos.length) {
+      // restart
+      currentPhoto = 0;
+    }
+    this.setState({ currentPhoto });
   }
 
   toggleFullscreen = () => {

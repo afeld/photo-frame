@@ -17,9 +17,11 @@ export default class FBLogin extends Component<Props> {
 
   render() {
     return (
-      <a className="fb-login" href="#" onClick={this.onClick}>
-        Login with Facebook
-      </a>
+      <div className="fb-login-wrapper">
+        <a className="fb-login" href="#" onClick={this.onClick}>
+          Login with Facebook
+        </a>
+      </div>
     );
   }
 }

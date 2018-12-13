@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import "./Img.css";
 
 interface Props {
+  className?: string;
   photo: pf.Photo;
 }
 
@@ -34,7 +35,7 @@ export default class Img extends Component<Props> {
     return (
       <img
         alt={photo.name}
-        className="img"
+        className={"img " + this.props.className}
         sizes={sizes}
         src={url}
         srcSet={srcset}

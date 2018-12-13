@@ -52,14 +52,25 @@ export default class Carousel extends Component<Props, State> {
     );
   }
 
-  advance() {
-    let currentPhoto = this.state.currentPhoto || 0;
-    currentPhoto += 1;
-    if (currentPhoto >= this.state.photos.length) {
-      // restart
-      currentPhoto = 0;
+  nextPhotoIndex() {
+    let result = this.state.currentPhoto;
+    if (result === undefined) {
+      return result;
     }
-    this.setState({ currentPhoto });
+    result = result || 0;
+    result += 1;
+    if (result >= this.state.photos.length) {
+      // restart
+      result = 0;
+    }
+    return result;
+  }
+
+  advance() {
+    const next = this.nextPhotoIndex();
+    if (next) {
+      this.setState({ currentPhoto: next });
+    }
   }
 
   toggleFullscreen = () => {
@@ -83,7 +94,17 @@ export default class Carousel extends Component<Props, State> {
     if (this.state.currentPhoto === undefined) {
       return null;
     }
-    return <Img photo={this.state.photos[this.state.currentPhoto]} />;
+    const photo = this.state.photos[this.state.currentPhoto];
+    return <Img photo={photo} />;
+  }
+
+  preloader() {
+    const nextPhotoIndex = this.nextPhotoIndex();
+    if (nextPhotoIndex === undefined) {
+      return null;
+    }
+    const photo = this.state.photos[nextPhotoIndex];
+    return <Img className="preloader" photo={photo} />;
   }
 
   render() {
@@ -100,6 +121,7 @@ export default class Carousel extends Component<Props, State> {
           />
         </a>
         {this.img()}
+        {this.preloader()}
       </div>
     );
   }

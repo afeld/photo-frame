@@ -3,3 +3,8 @@
   object-fit: contain;
   width: 100%;
 }
+.preloader {
+  /* hide offscreen */
+  position: absolute;
+  left: -9999px;
+}

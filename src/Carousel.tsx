@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import shuffle from "lodash.shuffle";
 import Img from "./Img";
 import "./Carousel.css";
 
@@ -7,7 +8,7 @@ interface Props {
 }
 
 interface State {
-  displayedPhoto?: pf.Photo;
+  currentPhoto?: number;
   photos: pf.Photo[];
 }
 
@@ -44,18 +45,16 @@ export default class Carousel extends Component<Props, State> {
       "me/photos",
       { fields: "name,webp_images" },
       (response: PhotosResponse) => {
-        this.setState({ photos: response.data });
-        this.pickPhoto();
-        setInterval(this.pickPhoto.bind(this), DELAY);
+        const photos = shuffle(response.data);
+        this.setState({ currentPhoto: 0, photos });
+        setInterval(this.advance.bind(this), DELAY);
       }
     );
   }
 
-  pickPhoto() {
-    const photos = this.state.photos;
-    const index = Math.floor(Math.random() * photos.length);
-    const photo = photos[index];
-    this.setState({ displayedPhoto: photo });
+  advance() {
+    const current = this.state.currentPhoto || 0;
+    this.setState({ currentPhoto: current + 1 });
   }
 
   toggleFullscreen = () => {
@@ -76,9 +75,10 @@ export default class Carousel extends Component<Props, State> {
   };
 
   render() {
-    const img = this.state.displayedPhoto ? (
-      <Img photo={this.state.displayedPhoto} />
-    ) : null;
+    const img =
+      this.state.currentPhoto === undefined ? null : (
+        <Img photo={this.state.photos[this.state.currentPhoto]} />
+      );
     return (
       <div className="carousel" ref={this.wrapperRef}>
         <a

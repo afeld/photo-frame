@@ -1,29 +1,43 @@
 import React, { Component } from "react";
 import "./FBLogin.css";
 
-interface LoggedInCB {
+interface CheckLoginStatusCB {
   (response: fb.StatusResponse): void;
 }
 
 interface Props {
-  FB: fb.FacebookStatic;
-  onLoggedIn: LoggedInCB;
+  checkLoginStatus: CheckLoginStatusCB;
+}
+
+declare global {
+  interface Window {
+    checkLoginStatus: CheckLoginStatusCB;
+  }
 }
 
 export default class FBLogin extends Component<Props> {
-  onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    this.props.FB.login(this.props.onLoggedIn, {
-      scope: "user_photos"
-    });
-    event.preventDefault();
-  };
+  componentDidMount() {
+    window.checkLoginStatus = this.props.checkLoginStatus;
+  }
+
+  componentWillUnmount() {
+    delete window.checkLoginStatus;
+  }
 
   render() {
     return (
       <div className="fb-login-wrapper">
-        <a className="fb-login" href="#" onClick={this.onClick}>
-          Login with Facebook
-        </a>
+        <div
+          className="fb-login-button"
+          data-auto-logout-link="false"
+          data-button-type="login_with"
+          data-max-rows="1"
+          data-onlogin="checkLoginStatus();"
+          data-scope="user_photos"
+          data-show-faces="false"
+          data-size="large"
+          data-use-continue-as="false"
+        />
       </div>
     );
   }

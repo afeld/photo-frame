@@ -16,16 +16,21 @@ class App extends Component<Props> {
     this.props.FB.init({
       appId: "301045530751709",
       status: true,
+      xfbml: true,
       version: "v3.2"
     });
 
     this.props.FB.AppEvents.logPageView();
-    this.props.FB.getLoginStatus(this.onLogin);
+    this.checkLoginStatus();
 
     setTimeout(() => {
       document.location.reload(true);
     }, RELOAD_AFTER);
   }
+
+  checkLoginStatus = () => {
+    this.props.FB.getLoginStatus(this.onLogin);
+  };
 
   onLogin = (response: fb.StatusResponse) => {
     if (response.status === "connected") {
@@ -37,7 +42,7 @@ class App extends Component<Props> {
     const login = this.state.loggedIn ? (
       <Carousel FB={this.props.FB} />
     ) : (
-      <FBLogin FB={this.props.FB} onLoggedIn={this.onLogin} />
+      <FBLogin checkLoginStatus={this.checkLoginStatus} />
     );
 
     return <div className="App">{login}</div>;

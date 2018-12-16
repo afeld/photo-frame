@@ -3,6 +3,8 @@ import Carousel from "./Carousel";
 import FBLogin from "./FBLogin";
 import "./App.css";
 
+const RELOAD_AFTER = 24 * 60 * 60 * 1000; // ms
+
 interface Props {
   FB: fb.FacebookStatic;
 }
@@ -19,6 +21,10 @@ class App extends Component<Props> {
 
     this.props.FB.AppEvents.logPageView();
     this.props.FB.getLoginStatus(this.onLogin);
+
+    setTimeout(() => {
+      document.location.reload();
+    }, RELOAD_AFTER);
   }
 
   onLogin = (response: fb.StatusResponse) => {

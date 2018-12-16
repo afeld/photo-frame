@@ -7,3 +7,7 @@ The app is built in React and TypeScript.
 ## Privacy
 
 While the application authenticates with Facebook and requests basic+photo permissions, no data is stored by the application itself. Note that the [Facebook SDK for JavaScript](https://developers.facebook.com/docs/javascript/) may set some cookies, etc.
+
+## Attribution
+
+Logo adapted from the [`images` Font Awesome icon](https://fontawesome.com/icons/images?style=regular) ([license](https://fontawesome.com/license)).

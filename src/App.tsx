@@ -23,7 +23,7 @@ class App extends Component<Props> {
     this.props.FB.getLoginStatus(this.onLogin);
 
     setTimeout(() => {
-      document.location.reload();
+      document.location.reload(true);
     }, RELOAD_AFTER);
   }
 

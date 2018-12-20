@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faExpandArrowsAlt } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
   wrapperRef: React.RefObject<HTMLDivElement>;
@@ -37,8 +39,9 @@ export default class FullscreenToggle extends Component<Props> {
     }
     return (
       <a className="fullscreen-toggle" href="#" onClick={this.onClick}>
-        <i
-          className="fas fa-expand-arrows-alt fa-2x"
+        <FontAwesomeIcon
+          icon={faExpandArrowsAlt}
+          size="2x"
           title="Toggle fullscreen"
         />
       </a>

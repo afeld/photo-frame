@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import shuffle from "lodash.shuffle";
 import Img from "./Img";
-import FullscreenToggle from "./FullscreenToggle";
+import Menu from "./Menu";
 import "./Carousel.css";
 
 interface Props {
@@ -87,8 +87,8 @@ export default class Carousel extends Component<Props, State> {
   render() {
     return (
       <div className="carousel" ref={this.wrapperRef}>
-        <FullscreenToggle wrapperRef={this.wrapperRef} />
         {this.img()}
+        <Menu fullscreenEl={this.wrapperRef} />
         {this.preloader()}
       </div>
     );

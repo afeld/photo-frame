@@ -39,13 +39,13 @@ class App extends Component<Props> {
   };
 
   render() {
-    const login = this.state.loggedIn ? (
+    const main = this.state.loggedIn ? (
       <Carousel FB={this.props.FB} />
     ) : (
       <FBLogin checkLoginStatus={this.checkLoginStatus} />
     );
 
-    return <div className="App">{login}</div>;
+    return <div className="App">{main}</div>;
   }
 }
 

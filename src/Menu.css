@@ -6,6 +6,8 @@
   box-shadow: 0 -8px 12px var(--background);
   left: 0;
   list-style-type: none;
+  margin: 0;
+  padding: 15px 20px;
   position: fixed;
   right: 0;
 }

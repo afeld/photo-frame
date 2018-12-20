@@ -10,7 +10,7 @@ interface Props {
 export default class Menu extends Component<Props> {
   render() {
     return (
-      <ul className="menu">
+      <ul className="menu" onClick={e => e.stopPropagation()}>
         <li>
           <FullscreenToggle
             isFullscreen={this.props.isFullscreen}

@@ -11,6 +11,7 @@ interface Props {
 interface State {
   currentPhoto?: number;
   isFullscreen: boolean;
+  menuVisible: boolean;
   photos: pf.Photo[];
 }
 
@@ -22,7 +23,11 @@ const DELAY = 30 * 1000; // ms
 
 export default class Carousel extends Component<Props, State> {
   // https://stackoverflow.com/a/51305453/358804
-  state: Readonly<State> = { isFullscreen: false, photos: [] };
+  state: Readonly<State> = {
+    isFullscreen: false,
+    menuVisible: true,
+    photos: []
+  };
 
   componentDidMount() {
     this.fetchPhotos();
@@ -72,6 +77,10 @@ export default class Carousel extends Component<Props, State> {
     return <Img photo={photo} />;
   }
 
+  toggleMenu = () => {
+    this.setState({ menuVisible: !this.state.menuVisible });
+  };
+
   isFullscreen = () => {
     return this.state.isFullscreen;
   };
@@ -92,17 +101,20 @@ export default class Carousel extends Component<Props, State> {
   }
 
   render() {
+    const menu = this.state.menuVisible ? (
+      <Menu
+        isFullscreen={this.isFullscreen}
+        toggleFullscreen={this.toggleFullscreen}
+      />
+    ) : null;
     return (
       <Fullscreen
         enabled={this.isFullscreen()}
         onChange={isFullscreen => this.setState({ isFullscreen })}
       >
-        <div className="carousel">
+        <div className="carousel" onClick={this.toggleMenu}>
           {this.img()}
-          <Menu
-            isFullscreen={this.isFullscreen}
-            toggleFullscreen={this.toggleFullscreen}
-          />
+          {menu}
           {this.preloader()}
         </div>
       </Fullscreen>

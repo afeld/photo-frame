@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Fullscreen from "react-full-screen";
+import uniqBy from "lodash.uniqby";
 import shuffle from "lodash.shuffle";
 import Img from "./Img";
 import Menu from "./Menu";
@@ -33,18 +34,27 @@ export default class Carousel extends Component<Props, State> {
     this.fetchPhotos();
   }
 
+  onPhotosFetched = (response: PhotosResponse) => {
+    // merge with previously fetched photos
+    let photos = this.state.photos.concat(response.data);
+    photos = uniqBy(photos, photo => photo.id);
+    photos = shuffle(photos);
+
+    this.setState({
+      currentPhoto: 0,
+      photos
+    });
+    setInterval(this.advance.bind(this), DELAY);
+  };
+
   fetchPhotos() {
+    const baseParams = { fields: "name,webp_images" };
+    // tagged photos
+    this.props.FB.api("me/photos", baseParams, this.onPhotosFetched);
     this.props.FB.api(
       "me/photos",
-      { fields: "name,webp_images" },
-      (response: PhotosResponse) => {
-        const photos = shuffle(response.data);
-        this.setState({
-          currentPhoto: 0,
-          photos
-        });
-        setInterval(this.advance.bind(this), DELAY);
-      }
+      { ...baseParams, type: "uploaded" },
+      this.onPhotosFetched
     );
   }
 

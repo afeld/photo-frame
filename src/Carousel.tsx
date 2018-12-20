@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Fullscreen from "react-full-screen";
 import shuffle from "lodash.shuffle";
 import Img from "./Img";
 import Menu from "./Menu";
@@ -9,6 +10,7 @@ interface Props {
 
 interface State {
   currentPhoto?: number;
+  isFullscreen: boolean;
   photos: pf.Photo[];
 }
 
@@ -20,14 +22,7 @@ const DELAY = 30 * 1000; // ms
 
 export default class Carousel extends Component<Props, State> {
   // https://stackoverflow.com/a/51305453/358804
-  state: Readonly<State> = { photos: [] };
-
-  wrapperRef: React.RefObject<HTMLDivElement>;
-
-  constructor(props: Props) {
-    super(props);
-    this.wrapperRef = React.createRef();
-  }
+  state: Readonly<State> = { isFullscreen: false, photos: [] };
 
   componentDidMount() {
     this.fetchPhotos();
@@ -39,7 +34,10 @@ export default class Carousel extends Component<Props, State> {
       { fields: "name,webp_images" },
       (response: PhotosResponse) => {
         const photos = shuffle(response.data);
-        this.setState({ currentPhoto: 0, photos });
+        this.setState({
+          currentPhoto: 0,
+          photos
+        });
         setInterval(this.advance.bind(this), DELAY);
       }
     );
@@ -74,6 +72,16 @@ export default class Carousel extends Component<Props, State> {
     return <Img photo={photo} />;
   }
 
+  isFullscreen = () => {
+    return this.state.isFullscreen;
+  };
+
+  toggleFullscreen = () => {
+    this.setState({
+      isFullscreen: !this.state.isFullscreen
+    });
+  };
+
   preloader() {
     const nextPhotoIndex = this.nextPhotoIndex();
     if (nextPhotoIndex === undefined) {
@@ -85,11 +93,19 @@ export default class Carousel extends Component<Props, State> {
 
   render() {
     return (
-      <div className="carousel" ref={this.wrapperRef}>
-        {this.img()}
-        <Menu fullscreenEl={this.wrapperRef} />
-        {this.preloader()}
-      </div>
+      <Fullscreen
+        enabled={this.isFullscreen()}
+        onChange={isFullscreen => this.setState({ isFullscreen })}
+      >
+        <div className="carousel">
+          {this.img()}
+          <Menu
+            isFullscreen={this.isFullscreen}
+            toggleFullscreen={this.toggleFullscreen}
+          />
+          {this.preloader()}
+        </div>
+      </Fullscreen>
     );
   }
 }

@@ -3,7 +3,8 @@ import FullscreenToggle from "./FullscreenToggle";
 import "./Menu.css";
 
 interface Props {
-  fullscreenEl: React.RefObject<HTMLDivElement>;
+  isFullscreen(): boolean;
+  toggleFullscreen(): void;
 }
 
 export default class Menu extends Component<Props> {
@@ -11,7 +12,10 @@ export default class Menu extends Component<Props> {
     return (
       <ul className="menu">
         <li>
-          <FullscreenToggle wrapperRef={this.props.fullscreenEl} />
+          <FullscreenToggle
+            isFullscreen={this.props.isFullscreen}
+            toggleFullscreen={this.props.toggleFullscreen}
+          />
         </li>
       </ul>
     );

@@ -34,17 +34,23 @@ export default class Carousel extends Component<Props, State> {
     this.fetchPhotos();
   }
 
+  start() {
+    if (typeof this.state.currentPhoto === "number") {
+      // already started
+      return;
+    }
+    this.setState({ currentPhoto: 0 });
+    setInterval(this.advance.bind(this), DELAY);
+  }
+
   onPhotosFetched = (response: PhotosResponse) => {
     // merge with previously fetched photos
-    let photos = this.state.photos.concat(response.data);
+    const newPhotos = shuffle(response.data);
+    let photos = this.state.photos.concat(newPhotos);
     photos = uniqBy(photos, photo => photo.id);
-    photos = shuffle(photos);
 
-    this.setState({
-      currentPhoto: 0,
-      photos
-    });
-    setInterval(this.advance.bind(this), DELAY);
+    this.setState({ photos });
+    this.start();
   };
 
   fetchPhotos() {

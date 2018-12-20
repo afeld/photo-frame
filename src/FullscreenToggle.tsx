@@ -38,7 +38,7 @@ export default class FullscreenToggle extends Component<Props> {
     return (
       <a className="fullscreen-toggle" href="#" onClick={this.onClick}>
         <i
-          className="fas fa-expand-arrows-alt fa-lg"
+          className="fas fa-expand-arrows-alt fa-2x"
           title="Toggle fullscreen"
         />
       </a>

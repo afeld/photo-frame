@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import shuffle from "lodash.shuffle";
 import Img from "./Img";
 import Menu from "./Menu";
-import "./Carousel.css";
 
 interface Props {
   FB: fb.FacebookStatic;

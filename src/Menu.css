@@ -1,0 +1,9 @@
+.menu {
+  bottom: 0;
+  list-style-type: none;
+  position: fixed;
+}
+
+.menu a {
+  color: white;
+}

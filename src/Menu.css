@@ -1,7 +1,13 @@
 .menu {
+  --background: #0000007d;
+
+  background-color: var(--background);
   bottom: 0;
+  box-shadow: 0 -8px 12px var(--background);
+  left: 0;
   list-style-type: none;
   position: fixed;
+  right: 0;
 }
 
 .menu a {

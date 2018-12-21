@@ -145,6 +145,7 @@ export default class Carousel extends Component<Props, State> {
   render() {
     const menu = this.state.menuVisible ? (
       <Menu
+        FB={this.props.FB}
         isFullscreen={this.isFullscreen}
         toggleFullscreen={this.toggleFullscreen}
       />

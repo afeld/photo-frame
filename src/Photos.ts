@@ -27,6 +27,10 @@ const photosFromBatch = (response?: FBBatchResponse) => {
     return [];
   }
   const json = JSON.parse(response.body);
+  if (json.error) {
+    console.error(json.error.message);
+    return [];
+  }
   // there is one key+value pair per user
   const photosResponses = Object.values(json) as PhotosResponse[];
   return flatMap(photosResponses, photosFromUser);
@@ -57,15 +61,29 @@ export function getPhotos(
           name: "friends",
           relative_url: "me/friends?fields=id"
         },
-        // tagged photos
+
+        // my tagged photos
         {
           method: "GET",
-          relative_url: `photos?fields=${photoFields}&ids=me,{result=friends:$.data.*.id}`
+          relative_url: `photos?fields=${photoFields}&ids=me`
         },
-        // uploaded photos
+        // my uploaded photos
         {
           method: "GET",
-          relative_url: `photos?type=uploaded&fields=${photoFields}&ids=me,{result=friends:$.data.*.id}`
+          relative_url: `photos?type=uploaded&fields=${photoFields}&ids=me`
+        },
+
+        // -- split from requests above so that own photos are retrieved even if user has no friends --
+
+        // others' tagged photos
+        {
+          method: "GET",
+          relative_url: `photos?fields=${photoFields}&ids={result=friends:$.data.*.id}`
+        },
+        // others' uploaded photos
+        {
+          method: "GET",
+          relative_url: `photos?type=uploaded&fields=${photoFields}&ids={result=friends:$.data.*.id}`
         }
       ]
     },

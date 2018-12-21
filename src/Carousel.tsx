@@ -16,6 +16,10 @@ interface State {
   photos: pf.Photo[];
 }
 
+interface FBBatchResponse {
+  body: string;
+}
+
 interface FBError {
   message: string;
 }
@@ -75,13 +79,30 @@ export default class Carousel extends Component<Props, State> {
   };
 
   fetchPhotosFor(userId: string) {
-    const baseParams = { fields: "name,webp_images" };
-    // tagged photos
-    this.props.FB.api(`${userId}/photos`, baseParams, this.onPhotosFetched);
+    // batch requests
+    // https://stackoverflow.com/a/16001318/358804
     this.props.FB.api(
-      `${userId}/photos`,
-      { ...baseParams, type: "uploaded" },
-      this.onPhotosFetched
+      "/",
+      "post",
+      {
+        batch: [
+          // tagged photos
+          {
+            method: "GET",
+            relative_url: `${userId}/photos?fields=name,webp_images`
+          },
+          {
+            method: "GET",
+            relative_url: `${userId}/photos?fields=name,webp_images&type=uploaded`
+          }
+        ]
+      },
+      (responses: FBBatchResponse[]) => {
+        responses.forEach(response => {
+          const json = JSON.parse(response.body);
+          this.onPhotosFetched(json);
+        });
+      }
     );
   }
 

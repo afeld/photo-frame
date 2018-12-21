@@ -35,8 +35,13 @@ export default class Carousel extends Component<Props, State> {
   }
 
   start() {
-    if (typeof this.state.currentPhoto === "number") {
+    if (
       // already started
+      typeof this.state.currentPhoto === "number" ||
+      // no photos
+      !this.state.photos.length
+    ) {
+      // already started, or no photos
       return;
     }
     this.setState({ currentPhoto: 0 });

@@ -17,7 +17,7 @@ interface State {
 }
 
 interface PhotosResponse {
-  data: pf.Photo[];
+  data?: pf.Photo[];
 }
 
 interface FBUser {
@@ -25,7 +25,7 @@ interface FBUser {
 }
 
 interface FriendsResponse {
-  data: FBUser[];
+  data?: FBUser[];
 }
 
 const DELAY = 30 * 1000; // ms
@@ -49,7 +49,6 @@ export default class Carousel extends Component<Props, State> {
       // no photos
       !this.state.photos.length
     ) {
-      // already started, or no photos
       return;
     }
     this.setState({ currentPhoto: 0 });
@@ -83,7 +82,8 @@ export default class Carousel extends Component<Props, State> {
       "me/friends",
       { fields: "id" },
       (response: FriendsResponse) => {
-        response.data.forEach(user => {
+        const friends = response.data || [];
+        friends.forEach(user => {
           this.fetchPhotosFor(user.id);
         });
       }

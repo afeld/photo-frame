@@ -85,6 +85,7 @@ export default class Carousel extends Component<Props, State> {
       "/",
       "post",
       {
+        include_headers: false,
         batch: [
           // tagged photos
           {

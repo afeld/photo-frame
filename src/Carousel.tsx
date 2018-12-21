@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import Fullscreen from "react-full-screen";
-import uniqBy from "lodash.uniqby";
 import shuffle from "lodash.shuffle";
 import Img from "./Img";
 import Menu from "./Menu";
+import { getPhotos } from "./Photos";
 
 interface Props {
   FB: fb.FacebookStatic;
@@ -14,19 +14,6 @@ interface State {
   isFullscreen: boolean;
   menuVisible: boolean;
   photos: pf.Photo[];
-}
-
-interface FBBatchResponse {
-  body: string;
-}
-
-interface FBError {
-  message: string;
-}
-
-interface PhotosResponse {
-  data?: pf.Photo[];
-  error?: FBError;
 }
 
 const DELAY = 30 * 1000; // ms
@@ -56,63 +43,14 @@ export default class Carousel extends Component<Props, State> {
     setInterval(this.advance.bind(this), DELAY);
   }
 
-  onPhotosFetched = (responses: FBBatchResponse[]) => {
-    let photos = responses.reduce(
-      (acc, response) => {
-        if (!response) {
-          return acc;
-        }
-        const json = JSON.parse(response.body) as PhotosResponse;
-        if (json.error) {
-          console.error(json.error.message);
-        }
-        return Object.values(json).reduce(
-          (innerAcc, photoRes) => innerAcc.concat(photoRes.data),
-          acc
-        );
-      },
-      [] as pf.Photo[]
-    );
-
+  onPhotosFetched = (photos: pf.Photo[]) => {
     photos = shuffle(photos);
-    photos = uniqBy(photos, photo => photo.id);
-
     this.setState({ photos });
     this.start();
   };
 
   fetchPhotos() {
-    // batch requests
-    // https://stackoverflow.com/a/16001318/358804
-    // https://developers.facebook.com/docs/graph-api/making-multiple-requests#operations
-    // https://developers.facebook.com/docs/graph-api/advanced#largerequests
-    this.props.FB.api(
-      "/",
-      "post",
-      {
-        include_headers: false,
-        batch: [
-          {
-            method: "GET",
-            name: "friends",
-            relative_url: "me/friends?fields=id"
-          },
-          // tagged photos
-          {
-            method: "GET",
-            relative_url:
-              "photos?fields=name,webp_images&ids=me,{result=friends:$.data.*.id}"
-          },
-          // uploaded photos
-          {
-            method: "GET",
-            relative_url:
-              "photos?type=uploaded&fields=name,webp_images&ids=me,{result=friends:$.data.*.id}"
-          }
-        ]
-      },
-      this.onPhotosFetched
-    );
+    getPhotos(this.props.FB, this.onPhotosFetched);
   }
 
   nextPhotoIndex() {

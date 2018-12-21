@@ -29,15 +29,6 @@ interface PhotosResponse {
   error?: FBError;
 }
 
-interface FBUser {
-  id: string;
-}
-
-interface FriendsResponse {
-  data?: FBUser[];
-  error?: FBError;
-}
-
 const DELAY = 30 * 1000; // ms
 
 export default class Carousel extends Component<Props, State> {
@@ -65,13 +56,25 @@ export default class Carousel extends Component<Props, State> {
     setInterval(this.advance.bind(this), DELAY);
   }
 
-  onPhotosFetched = (response: PhotosResponse) => {
-    if (response.error) {
-      console.error(response.error.message);
-    }
-    // merge with previously fetched photos
-    const newPhotos = shuffle(response.data);
-    let photos = this.state.photos.concat(newPhotos);
+  onPhotosFetched = (responses: FBBatchResponse[]) => {
+    let photos = responses.reduce(
+      (acc, response) => {
+        if (!response) {
+          return acc;
+        }
+        const json = JSON.parse(response.body) as PhotosResponse;
+        if (json.error) {
+          console.error(json.error.message);
+        }
+        return Object.values(json).reduce(
+          (innerAcc, photoRes) => innerAcc.concat(photoRes.data),
+          acc
+        );
+      },
+      [] as pf.Photo[]
+    );
+
+    photos = shuffle(photos);
     photos = uniqBy(photos, photo => photo.id);
 
     this.setState({ photos });
@@ -108,15 +111,7 @@ export default class Carousel extends Component<Props, State> {
           }
         ]
       },
-      (responses: FBBatchResponse[]) => {
-        responses.forEach(response => {
-          if (!response) {
-            return;
-          }
-          const json = JSON.parse(response.body);
-          Object.values(json).forEach(this.onPhotosFetched);
-        });
-      }
+      this.onPhotosFetched
     );
   }
 

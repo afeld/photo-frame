@@ -16,8 +16,13 @@ interface State {
   photos: pf.Photo[];
 }
 
+interface FBError {
+  message: string;
+}
+
 interface PhotosResponse {
   data?: pf.Photo[];
+  error?: FBError;
 }
 
 interface FBUser {
@@ -26,6 +31,7 @@ interface FBUser {
 
 interface FriendsResponse {
   data?: FBUser[];
+  error?: FBError;
 }
 
 const DELAY = 30 * 1000; // ms
@@ -56,6 +62,9 @@ export default class Carousel extends Component<Props, State> {
   }
 
   onPhotosFetched = (response: PhotosResponse) => {
+    if (response.error) {
+      console.error(response.error.message);
+    }
     // merge with previously fetched photos
     const newPhotos = shuffle(response.data);
     let photos = this.state.photos.concat(newPhotos);
@@ -82,6 +91,9 @@ export default class Carousel extends Component<Props, State> {
       "me/friends",
       { fields: "id" },
       (response: FriendsResponse) => {
+        if (response.error) {
+          console.error(response.error.message);
+        }
         const friends = response.data || [];
         friends.forEach(user => {
           this.fetchPhotosFor(user.id);

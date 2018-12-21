@@ -78,47 +78,43 @@ export default class Carousel extends Component<Props, State> {
     this.start();
   };
 
-  fetchPhotosFor(userId: string) {
+  fetchPhotos() {
     // batch requests
     // https://stackoverflow.com/a/16001318/358804
+    // https://developers.facebook.com/docs/graph-api/making-multiple-requests#operations
+    // https://developers.facebook.com/docs/graph-api/advanced#largerequests
     this.props.FB.api(
       "/",
       "post",
       {
         include_headers: false,
         batch: [
+          {
+            method: "GET",
+            name: "friends",
+            relative_url: "me/friends?fields=id"
+          },
           // tagged photos
           {
             method: "GET",
-            relative_url: `${userId}/photos?fields=name,webp_images`
+            relative_url:
+              "photos?fields=name,webp_images&ids=me,{result=friends:$.data.*.id}"
           },
+          // uploaded photos
           {
             method: "GET",
-            relative_url: `${userId}/photos?fields=name,webp_images&type=uploaded`
+            relative_url:
+              "photos?type=uploaded&fields=name,webp_images&ids=me,{result=friends:$.data.*.id}"
           }
         ]
       },
       (responses: FBBatchResponse[]) => {
         responses.forEach(response => {
+          if (!response) {
+            return;
+          }
           const json = JSON.parse(response.body);
-          this.onPhotosFetched(json);
-        });
-      }
-    );
-  }
-
-  fetchPhotos() {
-    this.fetchPhotosFor("me");
-    this.props.FB.api(
-      "me/friends",
-      { fields: "id" },
-      (response: FriendsResponse) => {
-        if (response.error) {
-          console.error(response.error.message);
-        }
-        const friends = response.data || [];
-        friends.forEach(user => {
-          this.fetchPhotosFor(user.id);
+          Object.values(json).forEach(this.onPhotosFetched);
         });
       }
     );

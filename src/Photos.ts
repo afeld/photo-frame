@@ -16,17 +16,22 @@ interface PhotosResponse {
 const onPhotosFetched = (responses: FBBatchResponse[]) => {
   const photos = responses.reduce(
     (acc, response) => {
+      // exclude the friends' non-response
       if (!response) {
         return acc;
       }
-      const json = JSON.parse(response.body) as PhotosResponse;
-      if (json.error) {
-        console.error(json.error.message);
-      }
-      return Object.values(json).reduce(
-        (innerAcc, photoRes) => innerAcc.concat(photoRes.data),
-        acc
-      );
+      const json = JSON.parse(response.body);
+      // there is one key+value pair per user
+      const photosResponses = Object.values(json) as PhotosResponse[];
+      return photosResponses.reduce((innerAcc, photosRes) => {
+        if (photosRes.error) {
+          console.error(photosRes.error.message);
+        }
+        if (!photosRes.data) {
+          return innerAcc;
+        }
+        return innerAcc.concat(photosRes.data);
+      }, acc);
     },
     [] as pf.Photo[]
   );

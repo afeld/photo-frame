@@ -11,6 +11,12 @@ interface Props {
 }
 
 export default class FullscreenToggle extends Component<Props> {
+  onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    this.props.toggleFullscreen();
+    // don't add the hash
+    event.preventDefault();
+  };
+
   render() {
     if (!document.fullscreenEnabled) {
       // not supported
@@ -21,11 +27,7 @@ export default class FullscreenToggle extends Component<Props> {
       ? "Make fullscreen."
       : "Exit fullscreen.";
     return (
-      <a
-        className="fullscreen-toggle"
-        href="#"
-        onClick={this.props.toggleFullscreen}
-      >
+      <a className="fullscreen-toggle" href="#" onClick={this.onClick}>
         <FontAwesomeIcon icon={icon} size="2x" title={title} />
       </a>
     );

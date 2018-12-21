@@ -20,6 +20,14 @@ interface PhotosResponse {
   data: pf.Photo[];
 }
 
+interface FBUser {
+  id: string;
+}
+
+interface FriendsResponse {
+  data: FBUser[];
+}
+
 const DELAY = 30 * 1000; // ms
 
 export default class Carousel extends Component<Props, State> {
@@ -58,14 +66,27 @@ export default class Carousel extends Component<Props, State> {
     this.start();
   };
 
-  fetchPhotos() {
+  fetchPhotosFor(userId: string) {
     const baseParams = { fields: "name,webp_images" };
     // tagged photos
-    this.props.FB.api("me/photos", baseParams, this.onPhotosFetched);
+    this.props.FB.api(`${userId}/photos`, baseParams, this.onPhotosFetched);
     this.props.FB.api(
-      "me/photos",
+      `${userId}/photos`,
       { ...baseParams, type: "uploaded" },
       this.onPhotosFetched
+    );
+  }
+
+  fetchPhotos() {
+    this.fetchPhotosFor("me");
+    this.props.FB.api(
+      "me/friends",
+      { fields: "id" },
+      (response: FriendsResponse) => {
+        response.data.forEach(user => {
+          this.fetchPhotosFor(user.id);
+        });
+      }
     );
   }
 

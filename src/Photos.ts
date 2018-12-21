@@ -1,3 +1,4 @@
+import flatMap from "lodash.flatmap";
 import uniqBy from "lodash.uniqby";
 
 interface FBBatchResponse {
@@ -20,24 +21,19 @@ const photosFromUser = (response: PhotosResponse) => {
   return response.data || [];
 };
 
-const onPhotosFetched = (responses: FBBatchResponse[]) => {
-  const photos = responses.reduce(
-    (acc, response) => {
-      // exclude the friends' non-response
-      if (!response) {
-        return acc;
-      }
-      const json = JSON.parse(response.body);
-      // there is one key+value pair per user
-      const photosResponses = Object.values(json) as PhotosResponse[];
-      return photosResponses.reduce((innerAcc, photosRes) => {
-        const photos = photosFromUser(photosRes);
-        return innerAcc.concat(photos);
-      }, acc);
-    },
-    [] as pf.Photo[]
-  );
+const photosFromBatch = (response?: FBBatchResponse) => {
+  // exclude the friends' non-response
+  if (!response) {
+    return [];
+  }
+  const json = JSON.parse(response.body);
+  // there is one key+value pair per user
+  const photosResponses = Object.values(json) as PhotosResponse[];
+  return flatMap(photosResponses, photosFromUser);
+};
 
+const onPhotosFetched = (responses: FBBatchResponse[]) => {
+  const photos = flatMap(responses, photosFromBatch);
   return uniqBy(photos, photo => photo.id);
 };
 

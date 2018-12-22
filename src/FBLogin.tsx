@@ -33,7 +33,7 @@ export default class FBLogin extends Component<Props> {
           data-button-type="login_with"
           data-max-rows="1"
           data-onlogin="checkLoginStatus();"
-          data-scope="user_photos"
+          data-scope="user_friends,user_photos"
           data-show-faces="false"
           data-size="large"
           data-use-continue-as="false"

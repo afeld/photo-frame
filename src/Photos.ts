@@ -9,6 +9,11 @@ interface FBError {
   message: string;
 }
 
+interface FBBatchOpResponse {
+  error?: FBError;
+  [userId: string]: any; // should actually be PhotosResponse but TypeScript gives an error
+}
+
 interface PhotosResponse {
   data?: pf.Photo[];
   error?: FBError;
@@ -21,12 +26,12 @@ const photosFromUser = (response: PhotosResponse) => {
   return response.data || [];
 };
 
-const photosFromBatch = (response?: FBBatchResponse) => {
+const photosFromBatch = (response: FBBatchResponse | null) => {
   // exclude the friends' non-response
   if (!response) {
     return [];
   }
-  const json = JSON.parse(response.body);
+  const json = JSON.parse(response.body) as FBBatchOpResponse;
   if (json.error) {
     console.error(json.error.message);
     return [];
@@ -36,7 +41,7 @@ const photosFromBatch = (response?: FBBatchResponse) => {
   return flatMap(photosResponses, photosFromUser);
 };
 
-const onPhotosFetched = (responses: FBBatchResponse[]) => {
+export const onPhotosFetched = (responses: (FBBatchResponse | null)[]) => {
   const photos = flatMap(responses, photosFromBatch);
   return uniqBy(photos, photo => photo.id);
 };
@@ -87,7 +92,7 @@ export function getPhotos(
         }
       ]
     },
-    (responses: FBBatchResponse[]) => {
+    (responses: (FBBatchResponse | null)[]) => {
       const photos = onPhotosFetched(responses);
       cb(photos);
     }

@@ -9,7 +9,7 @@ interface FBPermissionsResponse {
 
 export const SCOPES = new Set(["user_friends", "user_photos"]);
 
-const arePermissionsGranted = (perms: FBPermission[]) => {
+export const arePermissionsGranted = (perms: FBPermission[]) => {
   // convert to a Set
   const grantedScopes = new Set();
   perms.forEach((perm: FBPermission) => {

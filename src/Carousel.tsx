@@ -94,7 +94,13 @@ export default class Carousel extends Component<Props, State> {
   };
 
   toggleMenu = () => {
-    this.setState({ menuVisible: !this.state.menuVisible });
+    const menuVisible = !this.state.menuVisible;
+    this.setState({ menuVisible });
+    if (menuVisible) {
+      setTimeout(() => {
+        this.setState({ menuVisible: false });
+      }, 3000);
+    }
   };
 
   isFullscreen = () => {

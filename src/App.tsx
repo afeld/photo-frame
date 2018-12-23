@@ -9,6 +9,15 @@ interface Props {
   FB: fb.FacebookStatic;
 }
 
+interface FBPermission {
+  permission: string;
+  status: string;
+}
+
+interface FBPermissionsResponse {
+  data: FBPermission[];
+}
+
 class App extends Component<Props> {
   state = { loggedIn: false };
 
@@ -32,10 +41,10 @@ class App extends Component<Props> {
     this.props.FB.getLoginStatus(this.onLogin);
   };
 
-  arePermissionsGranted(perms: any) {
+  arePermissionsGranted(perms: FBPermission[]) {
     // convert to a Set
     const grantedScopes = new Set();
-    perms.data.forEach((perm: any) => {
+    perms.forEach((perm: FBPermission) => {
       if (perm.status === "granted") {
         grantedScopes.add(perm.permission);
       }
@@ -55,9 +64,12 @@ class App extends Component<Props> {
   }
 
   confirmPermissions(cb: (hasPermissions: boolean) => void) {
-    this.props.FB.api("me/permissions", (perms: any) => {
-      cb(this.arePermissionsGranted(perms));
-    });
+    this.props.FB.api(
+      "me/permissions",
+      (permsResponse: FBPermissionsResponse) => {
+        cb(this.arePermissionsGranted(permsResponse.data));
+      }
+    );
   }
 
   onLogin = (response: fb.StatusResponse) => {

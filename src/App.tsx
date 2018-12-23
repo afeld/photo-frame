@@ -32,25 +32,39 @@ class App extends Component<Props> {
     this.props.FB.getLoginStatus(this.onLogin);
   };
 
+  arePermissionsGranted(perms: any) {
+    // convert to a Set
+    const grantedScopes = new Set();
+    perms.data.forEach((perm: any) => {
+      if (perm.status === "granted") {
+        grantedScopes.add(perm.permission);
+      }
+    });
+
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set#Implementing_basic_set_operations
+    for (const scope of SCOPES) {
+      if (!grantedScopes.has(scope)) {
+        // missing scope
+        console.error(`Missing ${scope} scope.`);
+        return false;
+      }
+    }
+
+    // has all scopes
+    return true;
+  }
+
+  confirmPermissions(cb: (hasPermissions: boolean) => void) {
+    this.props.FB.api("me/permissions", (perms: any) => {
+      cb(this.arePermissionsGranted(perms));
+    });
+  }
+
   onLogin = (response: fb.StatusResponse) => {
     response.authResponse.grantedScopes;
     if (response.status === "connected") {
-      this.props.FB.api("me/permissions", (perms: any) => {
-        const grantedScopes = new Set();
-        perms.data.forEach((perm: any) => {
-          if (perm.status === "granted") {
-            grantedScopes.add(perm.permission);
-          }
-        });
-
-        for (const scope of SCOPES) {
-          if (!grantedScopes.has(scope)) {
-            // missing scope
-            return;
-          }
-        }
-        // has all scopes
-        this.setState({ loggedIn: true });
+      this.confirmPermissions(hasPermissions => {
+        this.setState({ loggedIn: hasPermissions });
       });
     }
   };

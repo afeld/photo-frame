@@ -1,9 +1,16 @@
 /* https://stackoverflow.com/a/48030340/358804 */
 .fb-login-wrapper {
+  align-items: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-  text-align: center;
   min-height: 100vh;
+}
+
+.fb-login-wrapper li {
+  margin: 10px 0;
+}
+
+.fb-login-wrapper a {
+  color: white;
 }

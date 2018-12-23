@@ -1,8 +1,8 @@
-import { onPhotosFetched } from "./Photos";
+import { handleBatchResponse, onPhotosFetched } from "./Photos";
 
 it("handles null responses", () => {
   const responses = [null];
-  expect(onPhotosFetched(responses)).toEqual([]);
+  expect(handleBatchResponse(responses)).toEqual([]);
 });
 
 it("gives the unique photos by ID", () => {

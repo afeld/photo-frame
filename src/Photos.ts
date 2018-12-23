@@ -36,11 +36,7 @@ const photosFromUser = (response: FBErrorResponse | PhotosResponse) => {
   return response.data;
 };
 
-const photosFromBatch = (response: FBBatchResponse | null) => {
-  // exclude the friends' non-response
-  if (!response) {
-    return [];
-  }
+const photosFromBatch = (response: FBBatchResponse) => {
   const json = JSON.parse(response.body) as FBBatchOpResponse | FBErrorResponse;
   if (isErrorResponse(json)) {
     console.error(json.error.message);
@@ -51,9 +47,15 @@ const photosFromBatch = (response: FBBatchResponse | null) => {
   return flatMap(photosResponses, photosFromUser);
 };
 
-export const onPhotosFetched = (responses: (FBBatchResponse | null)[]) => {
+export const onPhotosFetched = (responses: FBBatchResponse[]) => {
   const photos = flatMap(responses, photosFromBatch);
   return uniqBy(photos, photo => photo.id);
+};
+
+export const handleBatchResponse = (responses: (FBBatchResponse | null)[]) => {
+  // exclude the friends' non-response
+  const photoResponses = responses.slice(1) as FBBatchResponse[];
+  return onPhotosFetched(photoResponses);
 };
 
 export function getPhotos(
@@ -103,7 +105,7 @@ export function getPhotos(
       ]
     },
     (responses: (FBBatchResponse | null)[]) => {
-      const photos = onPhotosFetched(responses);
+      const photos = handleBatchResponse(responses);
       cb(photos);
     }
   );

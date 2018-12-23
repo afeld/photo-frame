@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { SCOPES } from "./Perms";
 import "./FBLogin.css";
 
 interface CheckLoginStatusCB {
@@ -14,8 +15,6 @@ declare global {
     checkLoginStatus: CheckLoginStatusCB;
   }
 }
-
-export const SCOPES = new Set(["user_friends", "user_photos"]);
 
 export default class FBLogin extends Component<Props> {
   componentDidMount() {

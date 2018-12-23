@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Fullscreen from "react-full-screen";
 import shuffle from "lodash.shuffle";
 import Img from "./Img";
+import Info from "./Info";
 import Menu from "./Menu";
 import { getPhotos } from "./Photos";
 
@@ -14,6 +15,7 @@ interface State {
   isFullscreen: boolean;
   menuVisible: boolean;
   photos: pf.Photo[];
+  showInfo: boolean;
 }
 
 const DELAY = 30 * 1000; // ms
@@ -23,7 +25,8 @@ export default class Carousel extends Component<Props, State> {
   state: Readonly<State> = {
     isFullscreen: false,
     menuVisible: true,
-    photos: []
+    photos: [],
+    showInfo: false
   };
 
   componentDidMount() {
@@ -82,6 +85,14 @@ export default class Carousel extends Component<Props, State> {
     return <Img photo={photo} />;
   }
 
+  showInfo = () => {
+    this.setState({ showInfo: true });
+  };
+
+  closeInfo = () => {
+    this.setState({ showInfo: false });
+  };
+
   toggleMenu = () => {
     this.setState({ menuVisible: !this.state.menuVisible });
   };
@@ -106,13 +117,19 @@ export default class Carousel extends Component<Props, State> {
   }
 
   render() {
+    if (this.state.showInfo) {
+      return <Info closeInfo={this.closeInfo} />;
+    }
+
     const menu = this.state.menuVisible ? (
       <Menu
         FB={this.props.FB}
         isFullscreen={this.isFullscreen}
+        showInfo={this.showInfo}
         toggleFullscreen={this.toggleFullscreen}
       />
     ) : null;
+
     return (
       <Fullscreen
         enabled={this.isFullscreen()}

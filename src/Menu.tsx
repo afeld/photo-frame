@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import { faInfoCircle, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 import FullscreenToggle from "./FullscreenToggle";
 import "./Menu.css";
 
 interface Props {
   FB: fb.FacebookStatic;
   isFullscreen(): boolean;
+  showInfo(): void;
   toggleFullscreen(): void;
 }
 
@@ -20,6 +21,15 @@ export default class Menu extends Component<Props> {
   render() {
     return (
       <ul className="menu" onClick={e => e.stopPropagation()}>
+        <li>
+          <a href="#" onClick={this.props.showInfo}>
+            <FontAwesomeIcon
+              icon={faInfoCircle}
+              size="2x"
+              title="Show information panel"
+            />
+          </a>
+        </li>
         <li>
           <FullscreenToggle
             isFullscreen={this.props.isFullscreen}

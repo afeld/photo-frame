@@ -1,7 +1,15 @@
+:root {
+  --text-color: white;
+}
+
 body {
   background-color: black;
-  color: white;
+  color: var(--text-color);
   font-family: sans-serif;
   margin: 0;
   padding: 0;
+}
+
+a {
+  color: var(--text-color);
 }

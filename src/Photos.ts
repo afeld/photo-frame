@@ -6,6 +6,7 @@ interface FBBatchResponse {
 }
 
 interface FBError {
+  code: number;
   message: string;
 }
 
@@ -39,7 +40,10 @@ const photosFromUser = (response: FBErrorResponse | PhotosResponse) => {
 const photosFromBatch = (response: FBBatchResponse) => {
   const json = JSON.parse(response.body) as FBBatchOpResponse | FBErrorResponse;
   if (isErrorResponse(json)) {
-    console.error(json.error.message);
+    // this is due to no friends being authorized, which is handled elsewhere
+    if (json.error.code !== 2500) {
+      console.error(json.error.message);
+    }
     return [];
   }
   // there is one key+value pair per user
@@ -52,7 +56,15 @@ export const onPhotosFetched = (responses: FBBatchResponse[]) => {
   return uniqBy(photos, photo => photo.id);
 };
 
-export const handleBatchResponse = (responses: (FBBatchResponse | null)[]) => {
+export const numFriends = (response: FBBatchResponse): number => {
+  const json = JSON.parse(response.body);
+  return json.data.length;
+};
+
+export const handleBatchResponse = (responses: FBBatchResponse[]) => {
+  if (!numFriends(responses[0])) {
+    console.log("No friends authorized.");
+  }
   // exclude the friends' non-response
   const photoResponses = responses.slice(1) as FBBatchResponse[];
   return onPhotosFetched(photoResponses);
@@ -76,6 +88,7 @@ export function getPhotos(
         {
           method: "GET",
           name: "friends",
+          omit_response_on_success: false,
           relative_url: "me/friends?fields=id"
         },
 
@@ -104,7 +117,7 @@ export function getPhotos(
         }
       ]
     },
-    (responses: (FBBatchResponse | null)[]) => {
+    (responses: FBBatchResponse[]) => {
       const photos = handleBatchResponse(responses);
       cb(photos);
     }

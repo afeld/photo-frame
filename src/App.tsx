@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Carousel from "./Carousel";
-import FBLogin from "./FBLogin";
+import FBLogin, { SCOPES } from "./FBLogin";
 import "./App.css";
 
 const RELOAD_AFTER = 24 * 60 * 60 * 1000; // ms
@@ -33,8 +33,25 @@ class App extends Component<Props> {
   };
 
   onLogin = (response: fb.StatusResponse) => {
+    response.authResponse.grantedScopes;
     if (response.status === "connected") {
-      this.setState({ loggedIn: true });
+      this.props.FB.api("me/permissions", (perms: any) => {
+        const grantedScopes = new Set();
+        perms.data.forEach((perm: any) => {
+          if (perm.status === "granted") {
+            grantedScopes.add(perm.permission);
+          }
+        });
+
+        for (const scope of SCOPES) {
+          if (!grantedScopes.has(scope)) {
+            // missing scope
+            return;
+          }
+        }
+        // has all scopes
+        this.setState({ loggedIn: true });
+      });
     }
   };
 

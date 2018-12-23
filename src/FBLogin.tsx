@@ -15,6 +15,8 @@ declare global {
   }
 }
 
+export const SCOPES = new Set(["user_friends", "user_photos"]);
+
 export default class FBLogin extends Component<Props> {
   componentDidMount() {
     window.checkLoginStatus = this.props.checkLoginStatus;
@@ -33,7 +35,7 @@ export default class FBLogin extends Component<Props> {
           data-button-type="login_with"
           data-max-rows="1"
           data-onlogin="checkLoginStatus();"
-          data-scope="user_friends,user_photos"
+          data-scope={Array.from(SCOPES).join(",")}
           data-show-faces="false"
           data-size="large"
           data-use-continue-as="false"

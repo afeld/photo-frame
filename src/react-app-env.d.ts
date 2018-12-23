@@ -7,6 +7,17 @@ declare namespace pf {
     width: number;
   }
 
+  interface ProfilePhoto {
+    url: string;
+  }
+
+  interface User {
+    id: string;
+    link: string;
+    name: string;
+    picture: { data: ProfilePhoto };
+  }
+
   interface Photo {
     id: string;
     name?: string;

@@ -56,23 +56,14 @@ export const onPhotosFetched = (responses: FBBatchResponse[]) => {
   return uniqBy(photos, photo => photo.id);
 };
 
-export const numFriends = (response: FBBatchResponse): number => {
+const getFriends = (response: FBBatchResponse): pf.User[] => {
   const json = JSON.parse(response.body);
-  return json.data.length;
+  return json.data;
 };
 
-export const handleBatchResponse = (responses: FBBatchResponse[]) => {
-  if (!numFriends(responses[0])) {
-    console.log("No friends authorized.");
-  }
-  // exclude the friends' non-response
-  const photoResponses = responses.slice(1) as FBBatchResponse[];
-  return onPhotosFetched(photoResponses);
-};
-
-export function getPhotos(
+export function getFriendsAndPhotos(
   FB: fb.FacebookStatic,
-  cb: (photos: pf.Photo[]) => void
+  cb: (friends: pf.User[], photos: pf.Photo[]) => void
 ) {
   const photoFields = "name,webp_images";
   // batch requests
@@ -89,7 +80,7 @@ export function getPhotos(
           method: "GET",
           name: "friends",
           omit_response_on_success: false,
-          relative_url: "me/friends?fields=id"
+          relative_url: "me/friends?fields=id,link,name,picture"
         },
 
         // my tagged photos
@@ -118,8 +109,12 @@ export function getPhotos(
       ]
     },
     (responses: FBBatchResponse[]) => {
-      const photos = handleBatchResponse(responses);
-      cb(photos);
+      const friends = getFriends(responses[0]);
+
+      // exclude the friends' response
+      const photoResponses = responses.slice(1) as FBBatchResponse[];
+      const photos = onPhotosFetched(photoResponses);
+      cb(friends, photos);
     }
   );
 }

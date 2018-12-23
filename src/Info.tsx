@@ -6,6 +6,7 @@ import "./Info.css";
 
 interface Props {
   closeInfo(): void;
+  friends: pf.User[];
 }
 
 export default class Info extends Component<Props> {
@@ -14,6 +15,34 @@ export default class Info extends Component<Props> {
     // don't add the hash
     event.preventDefault();
   };
+
+  renderFriend(friend: pf.User) {
+    return (
+      <li key={friend.id}>
+        <a href={friend.link}>
+          <img
+            className="friend-pic"
+            src={friend.picture.data.url}
+            alt="Profile picture"
+          />{" "}
+          {friend.name}
+        </a>
+      </li>
+    );
+  }
+
+  renderFriends() {
+    if (this.props.friends.length) {
+      const friends = this.props.friends.map(this.renderFriend);
+      return (
+        <div>
+          <p>Friends using the app:</p>
+          <ul>{friends}</ul>
+        </div>
+      );
+    }
+    return "No friends have signed in to Photo Frame.";
+  }
 
   render() {
     return (
@@ -26,6 +55,7 @@ export default class Info extends Component<Props> {
           />
         </a>
         <InfoText />
+        {this.renderFriends()}
       </div>
     );
   }

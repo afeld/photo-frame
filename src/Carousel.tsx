@@ -4,7 +4,7 @@ import shuffle from "lodash.shuffle";
 import Img from "./Img";
 import Info from "./Info";
 import Menu from "./Menu";
-import { getPhotos } from "./Photos";
+import { getFriendsAndPhotos } from "./Photos";
 
 interface Props {
   FB: fb.FacebookStatic;
@@ -12,6 +12,7 @@ interface Props {
 
 interface State {
   currentPhoto?: number;
+  friends: pf.User[];
   isFullscreen: boolean;
   menuVisible: boolean;
   photos: pf.Photo[];
@@ -23,6 +24,7 @@ const DELAY = 30 * 1000; // ms
 export default class Carousel extends Component<Props, State> {
   // https://stackoverflow.com/a/51305453/358804
   state: Readonly<State> = {
+    friends: [],
     isFullscreen: false,
     menuVisible: true,
     photos: [],
@@ -46,14 +48,14 @@ export default class Carousel extends Component<Props, State> {
     setInterval(this.advance.bind(this), DELAY);
   }
 
-  onPhotosFetched = (photos: pf.Photo[]) => {
+  onFriendsAndPhotosFetched = (friends: pf.User[], photos: pf.Photo[]) => {
     photos = shuffle(photos);
-    this.setState({ photos });
+    this.setState({ friends, photos });
     this.start();
   };
 
   fetchPhotos() {
-    getPhotos(this.props.FB, this.onPhotosFetched);
+    getFriendsAndPhotos(this.props.FB, this.onFriendsAndPhotosFetched);
   }
 
   nextPhotoIndex() {
@@ -124,7 +126,7 @@ export default class Carousel extends Component<Props, State> {
 
   render() {
     if (this.state.showInfo) {
-      return <Info closeInfo={this.closeInfo} />;
+      return <Info closeInfo={this.closeInfo} friends={this.state.friends} />;
     }
 
     const menu = this.state.menuVisible ? (

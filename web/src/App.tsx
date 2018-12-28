@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import Carousel from "./Carousel";
 import FBLogin from "./FBLogin";
 import confirmPermissions from "./Perms";
-import "./App.css";
 
 const RELOAD_AFTER = 24 * 60 * 60 * 1000; // ms
 export const FACEBOOK_ID = "301045530751709";

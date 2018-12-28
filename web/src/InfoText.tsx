@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import "./InfoText.css";
 
 export default class InfoText extends Component {
   render() {

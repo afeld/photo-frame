@@ -1,8 +1,8 @@
 import React from "react";
 import { Alert, Button, StyleSheet, Text, View } from "react-native";
 import { Facebook } from "expo";
-
-const FACEBOOK_ID = "301045530751709";
+import { FACEBOOK_ID } from "../web/src/App";
+import { SCOPES } from "../web/src/Perms";
 
 export default class App extends React.Component {
   logIn = async () => {
@@ -10,7 +10,7 @@ export default class App extends React.Component {
       const { type, token } = await Facebook.logInWithReadPermissionsAsync(
         FACEBOOK_ID,
         {
-          permissions: ["public_profile"]
+          permissions: Array.from(SCOPES)
         }
       );
       if (type === "success") {

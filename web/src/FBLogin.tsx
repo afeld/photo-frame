@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { SCOPES } from "./Perms";
 import InfoText from "./InfoText";
-import "./FBLogin.css";
 
 interface CheckLoginStatusCB {
   (response: fb.StatusResponse): void;

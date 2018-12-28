@@ -1,10 +1,14 @@
 import React from "react";
-import { Alert, Button, StyleSheet, Text, View } from "react-native";
+import { Button, Image, StyleSheet, Text, View } from "react-native";
 import { Facebook } from "expo";
 import { FACEBOOK_ID } from "../web/src/App";
 import { SCOPES } from "../web/src/Perms";
 
 export default class App extends React.Component {
+  state = {
+    img: null
+  };
+
   logIn = async () => {
     try {
       const { type, token } = await Facebook.logInWithReadPermissionsAsync(
@@ -16,9 +20,11 @@ export default class App extends React.Component {
       if (type === "success") {
         // Get the user's name using Facebook's Graph API
         const response = await fetch(
-          `https://graph.facebook.com/me?access_token=${token}`
+          `https://graph.facebook.com/me/photos?access_token=${token}&fields=name,images`
         );
-        Alert.alert("Logged in!", `Hi ${(await response.json()).name}!`);
+        const json = await response.json();
+        const img = json.data[0].images[0];
+        this.setState({ img });
       } else {
         // type === 'cancel'
       }
@@ -28,10 +34,21 @@ export default class App extends React.Component {
   };
 
   render() {
+    let img;
+    if (this.state.img) {
+      img = (
+        <Image
+          style={{ width: this.state.img.width, height: this.state.img.height }}
+          source={{ uri: this.state.img.source }}
+        />
+      );
+    }
+
     return (
       <View style={styles.container}>
         <Text>Open up App.js to start working on your app!</Text>
         <Button onPress={this.logIn} title="Log in with Facebook" />
+        {img}
       </View>
     );
   }

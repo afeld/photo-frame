@@ -64,59 +64,60 @@ const getFriends = (response: FBBatchResponse) => {
   return json.data;
 };
 
-export async function getFriendsAndPhotos(token: string) {
-  const photoFields = "name,images";
-  // batch requests
-  // https://stackoverflow.com/a/16001318/358804
-  // https://developers.facebook.com/docs/graph-api/making-multiple-requests#operations
-  // https://developers.facebook.com/docs/graph-api/advanced#largerequests
+// https://developers.facebook.com/docs/graph-api/making-multiple-requests#operations
+const fbBatchRequest = async (token: string, data: any[]) => {
   const formData = new FormData();
   formData.append("access_token", token);
   formData.append("include_headers", "false");
-  formData.append(
-    "batch",
-    JSON.stringify([
-      {
-        method: "GET",
-        name: "friends",
-        omit_response_on_success: false,
-        relative_url: "me/friends?fields=id,link,name,picture"
-      },
+  formData.append("batch", JSON.stringify(data));
 
-      // my tagged photos
-      {
-        method: "GET",
-        relative_url: `photos?fields=${photoFields}&ids=me`
-      },
-      // my uploaded photos
-      {
-        method: "GET",
-        relative_url: `photos?type=uploaded&fields=${photoFields}&ids=me`
-      },
-
-      // -- split from requests above so that own photos are retrieved even if user has no friends --
-
-      // others' tagged photos
-      {
-        method: "GET",
-        relative_url: `photos?fields=${photoFields}&ids={result=friends:$.data.*.id}`
-      },
-      // others' uploaded photos
-      {
-        method: "GET",
-        relative_url: `photos?type=uploaded&fields=${photoFields}&ids={result=friends:$.data.*.id}`
-      }
-    ])
-  );
   const response = await fetch(`https://graph.facebook.com/`, {
     method: "POST",
     body: formData
   });
-  const responses = (await response.json()) as FBBatchResponse[];
+  return (await response.json()) as FBBatchResponse[];
+};
+
+export async function getFriendsAndPhotos(token: string) {
+  const photoFields = "name,images";
+  // https://developers.facebook.com/docs/graph-api/advanced#largerequests
+  const responses = await fbBatchRequest(token, [
+    {
+      method: "GET",
+      name: "friends",
+      omit_response_on_success: false,
+      relative_url: "me/friends?fields=id,link,name,picture"
+    },
+
+    // my tagged photos
+    {
+      method: "GET",
+      relative_url: `photos?fields=${photoFields}&ids=me`
+    },
+    // my uploaded photos
+    {
+      method: "GET",
+      relative_url: `photos?type=uploaded&fields=${photoFields}&ids=me`
+    },
+
+    // -- split from requests above so that own photos are retrieved even if user has no friends --
+
+    // others' tagged photos
+    {
+      method: "GET",
+      relative_url: `photos?fields=${photoFields}&ids={result=friends:$.data.*.id}`
+    },
+    // others' uploaded photos
+    {
+      method: "GET",
+      relative_url: `photos?type=uploaded&fields=${photoFields}&ids={result=friends:$.data.*.id}`
+    }
+  ]);
   const friends = getFriends(responses[0]);
 
   // exclude the friends' response
   const photoResponses = responses.slice(1) as FBBatchResponse[];
   const photos = onPhotosFetched(photoResponses);
+
   return { friends, photos };
 }

@@ -8,8 +8,10 @@
   },
   "dependencies": {
     "@types/expo": "^31.0.5",
+    "@types/lodash": "^4.14.119",
     "@types/react-native": "^0.57.23",
     "expo": "^31.0.2",
+    "lodash": "^4.17.11",
     "react": "16.5.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-31.0.0.tar.gz"
   },

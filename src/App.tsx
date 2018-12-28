@@ -3,6 +3,7 @@ import { Button, Image, StyleSheet, Text, View } from "react-native";
 import { Facebook } from "expo";
 import { FACEBOOK_ID } from "../web/src/App";
 import { SCOPES } from "../web/src/Perms";
+import { getFriendsAndPhotos } from "./Photos";
 
 export default class App extends React.Component {
   state = {
@@ -10,26 +11,18 @@ export default class App extends React.Component {
   };
 
   logIn = async () => {
-    try {
-      const { type, token } = await Facebook.logInWithReadPermissionsAsync(
-        FACEBOOK_ID,
-        {
-          permissions: Array.from(SCOPES)
-        }
-      );
-      if (type === "success") {
-        // Get the user's name using Facebook's Graph API
-        const response = await fetch(
-          `https://graph.facebook.com/me/photos?access_token=${token}&fields=name,images`
-        );
-        const json = await response.json();
-        const img = json.data[0].images[0];
-        this.setState({ img });
-      } else {
-        // type === 'cancel'
+    const { type, token } = await Facebook.logInWithReadPermissionsAsync(
+      FACEBOOK_ID,
+      {
+        permissions: Array.from(SCOPES)
       }
-    } catch ({ message }) {
-      alert(`Facebook Login Error: ${message}`);
+    );
+    if (type === "success") {
+      const { photos } = await getFriendsAndPhotos(token);
+      const img = photos[0].images[0];
+      this.setState({ img });
+    } else {
+      // type === 'cancel'
     }
   };
 

@@ -5,6 +5,7 @@ import confirmPermissions from "./Perms";
 import "./App.css";
 
 const RELOAD_AFTER = 24 * 60 * 60 * 1000; // ms
+export const FACEBOOK_ID = "301045530751709";
 
 interface Props {
   FB: fb.FacebookStatic;
@@ -15,7 +16,7 @@ class App extends Component<Props> {
 
   componentDidMount() {
     this.props.FB.init({
-      appId: "301045530751709",
+      appId: FACEBOOK_ID,
       status: true,
       xfbml: true,
       version: "v3.2"

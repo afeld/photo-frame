@@ -1,6 +1,7 @@
 import React from "react";
-import { Image, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Facebook } from "expo";
+import Img from "./Img";
 import Login from "./Login";
 import { getFriendsAndPhotos } from "./Photos";
 
@@ -20,12 +21,7 @@ export default class App extends React.Component {
   render() {
     let img;
     if (this.state.img) {
-      img = (
-        <Image
-          style={{ width: this.state.img.width, height: this.state.img.height }}
-          source={{ uri: this.state.img.source }}
-        />
-      );
+      img = <Img img={this.state.img} />;
     }
 
     return (

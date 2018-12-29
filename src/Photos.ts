@@ -1,7 +1,7 @@
 import { flatMap, uniqBy, values } from "lodash";
 import fbBatchRequest, { FBBatchResponse } from "./FBAPI";
 
-declare namespace pf {
+export declare namespace pf {
   interface Image {
     height: number;
     source: string;

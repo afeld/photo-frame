@@ -1,5 +1,5 @@
 import React from "react";
-import { Image } from "react-native";
+import { Dimensions, Image } from "react-native";
 import { pf } from "./Photos";
 
 interface Props {
@@ -8,10 +8,18 @@ interface Props {
 
 export default class Img extends React.Component<Props> {
   render() {
+    const { height, width } = Dimensions.get("window");
+    const uri = this.props.img.source;
+
     return (
       <Image
-        style={{ width: this.props.img.width, height: this.props.img.height }}
-        source={{ uri: this.props.img.source }}
+        style={{
+          width,
+          height,
+          resizeMode: "contain",
+          backgroundColor: "black"
+        }}
+        source={{ uri }}
       />
     );
   }

@@ -1,8 +1,5 @@
 import { flatMap, uniqBy, values } from "lodash";
-
-interface FBBatchResponse {
-  body: string;
-}
+import fbBatchRequest, { FBBatchResponse } from "./FBAPI";
 
 interface FBError {
   code: number;
@@ -62,20 +59,6 @@ export const onPhotosFetched = (responses: FBBatchResponse[]) => {
 const getFriends = (response: FBBatchResponse) => {
   const json = JSON.parse(response.body) as FriendsResponse;
   return json.data;
-};
-
-// https://developers.facebook.com/docs/graph-api/making-multiple-requests#operations
-const fbBatchRequest = async (token: string, data: any[]) => {
-  const formData = new FormData();
-  formData.append("access_token", token);
-  formData.append("include_headers", "false");
-  formData.append("batch", JSON.stringify(data));
-
-  const response = await fetch(`https://graph.facebook.com/`, {
-    method: "POST",
-    body: formData
-  });
-  return (await response.json()) as FBBatchResponse[];
 };
 
 export async function getFriendsAndPhotos(token: string) {

@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StatusBar, StyleSheet, View } from "react-native";
 import { Facebook, ScreenOrientation } from "expo";
 import Carousel from "./Carousel";
 import Login from "./Login";
@@ -47,7 +47,12 @@ export default class App extends React.Component {
       <Login onLogin={this.logIn} />
     );
 
-    return <View style={styles.container}>{body}</View>;
+    return (
+      <View style={styles.container}>
+        <StatusBar hidden={true} />
+        {body}
+      </View>
+    );
   }
 }
 

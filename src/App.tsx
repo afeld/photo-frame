@@ -1,12 +1,13 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Facebook, SecureStore } from "expo";
+import { Facebook } from "expo";
 import Img from "./Img";
 import Login from "./Login";
+import { saveToken, fetchToken } from "./TokenStore";
 import { getFriendsAndPhotos } from "./Photos";
 
 export default class App extends React.Component {
-  state = { img: null, token: null };
+  state = { img: null };
 
   constructor(props) {
     super(props);
@@ -15,21 +16,15 @@ export default class App extends React.Component {
 
   logIn = async (response: Facebook.Response) => {
     if (response.type === "success") {
-      await SecureStore.setItemAsync("fb_token", response.token);
+      await saveToken(response.token);
       this.getImages();
     } else {
       // type === 'cancel'
     }
   };
 
-  async fetchSavedToken() {
-    const token = await SecureStore.getItemAsync("fb_token");
-    // TODO check expiration and scopes
-    return token;
-  }
-
   async getImages() {
-    const token = await this.fetchSavedToken();
+    const token = await fetchToken();
     if (!token) {
       return;
     }

@@ -1,41 +1,37 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { Facebook } from "expo";
-import Img from "./Img";
+import Carousel from "./Carousel";
 import Login from "./Login";
 import { saveToken, fetchToken } from "./TokenStore";
-import { getFriendsAndPhotos } from "./Photos";
 
 export default class App extends React.Component {
-  state = { img: null };
+  state = { token: null as string };
 
   constructor(props) {
     super(props);
-    this.getImages();
+    this.fetchToken();
+  }
+
+  async fetchToken() {
+    const token = await fetchToken();
+    if (token) {
+      this.setState({ token });
+    }
   }
 
   logIn = async (response: Facebook.Response) => {
     if (response.type === "success") {
       await saveToken(response.token);
-      this.getImages();
+      this.setState({ token: response.token });
     } else {
       // type === 'cancel'
     }
   };
 
-  async getImages() {
-    const token = await fetchToken();
-    if (!token) {
-      return;
-    }
-    const { photos } = await getFriendsAndPhotos(token);
-    const img = photos[0].images[0];
-    this.setState({ img });
-  }
-
   render() {
-    const body = this.state.img ? (
-      <Img img={this.state.img} />
+    const body = this.state.token ? (
+      <Carousel token={this.state.token} />
     ) : (
       <Login onLogin={this.logIn} />
     );

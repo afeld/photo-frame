@@ -1,35 +1,51 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Facebook } from "expo";
+import { Facebook, SecureStore } from "expo";
 import Img from "./Img";
 import Login from "./Login";
 import { getFriendsAndPhotos } from "./Photos";
 
 export default class App extends React.Component {
-  state = { img: null };
+  state = { img: null, token: null };
+
+  constructor(props) {
+    super(props);
+    this.getImages();
+  }
 
   logIn = async (response: Facebook.Response) => {
     if (response.type === "success") {
-      const { photos } = await getFriendsAndPhotos(response.token);
-      const img = photos[0].images[0];
-      this.setState({ img });
+      await SecureStore.setItemAsync("fb_token", response.token);
+      this.getImages();
     } else {
       // type === 'cancel'
     }
   };
 
-  render() {
-    let img;
-    if (this.state.img) {
-      img = <Img img={this.state.img} />;
-    }
+  async fetchSavedToken() {
+    const token = await SecureStore.getItemAsync("fb_token");
+    // TODO check expiration and scopes
+    return token;
+  }
 
-    return (
-      <View style={styles.container}>
-        <Login onLogin={this.logIn} />
-        {img}
-      </View>
+  async getImages() {
+    const token = await this.fetchSavedToken();
+    if (!token) {
+      return;
+    }
+    const { photos } = await getFriendsAndPhotos(token);
+    const img = photos[0].images[0];
+    this.setState({ img });
+  }
+
+  render() {
+    const body = this.state.img ? (
+      <Img img={this.state.img} />
+    ) : (
+      <Login onLogin={this.logIn} />
     );
+
+    return <View style={styles.container}>{body}</View>;
   }
 }
 

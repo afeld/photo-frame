@@ -6,14 +6,15 @@ interface Props {
   img: pf.Image;
 }
 
-interface State {
-  height: number;
-  width: number;
-}
+const initialDimensions = Dimensions.get("window");
 
-export default class Img extends React.Component<Props, State> {
-  componentWillMount() {
-    this.updateDimensions();
+export default class Img extends React.Component<Props> {
+  state = {
+    height: initialDimensions.height,
+    width: initialDimensions.width
+  };
+
+  componentDidMount() {
     Dimensions.addEventListener("change", this.updateDimensions);
   }
 

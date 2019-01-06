@@ -4,6 +4,7 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
+    "test": "jest",
     "eject": "expo eject"
   },
   "dependencies": {
@@ -16,7 +17,11 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-31.0.1.tar.gz"
   },
   "devDependencies": {
-    "babel-preset-expo": "^5.0.0"
+    "@types/jest": "^23.3.11",
+    "babel-preset-expo": "^5.0.0",
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.5",
+    "typescript": "^3.2.2"
   },
   "private": true
 }

@@ -1,44 +1,44 @@
-import React, { Component } from "react";
-import "./Img.css";
+import React from "react";
+import { Dimensions, Image } from "react-native";
+import { pf } from "./Photos";
 
 interface Props {
-  className?: string;
-  photo: pf.Photo;
+  img: pf.Image;
 }
 
-export default class Img extends Component<Props> {
-  sizeStr(img: pf.Image, i: number, images: pf.Image[]) {
-    // media condition "must be omitted for the last item"
-    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#attr-sizes
-    if (i === images.length - 1) {
-      return `${img.width}w`;
-    }
-    return `(max-width: ${img.width}px and max-height: ${img.height}px) ${
-      img.width
-    }w`;
+const initialDimensions = Dimensions.get("window");
+
+export default class Img extends React.Component<Props> {
+  state = {
+    height: initialDimensions.height,
+    width: initialDimensions.width
+  };
+
+  componentDidMount() {
+    Dimensions.addEventListener("change", this.updateDimensions);
   }
 
-  srcsetStr(img: pf.Image) {
-    return `${img.source} ${img.width}w`;
+  componentWillUnmount() {
+    Dimensions.removeEventListener("change", this.updateDimensions);
   }
+
+  updateDimensions = () => {
+    const { height, width } = Dimensions.get("window");
+    this.setState({ height, width });
+  };
 
   render() {
-    const photo = this.props.photo;
-    const images = photo.webp_images;
-    // the largest one - they are in descending order
-    const url = images[0].source;
-
-    // make images responsive
-    const sizes = images.map(this.sizeStr).join(", ");
-    const srcset = images.map(this.srcsetStr).join(", ");
+    const uri = this.props.img.source;
 
     return (
-      <img
-        alt={photo.name}
-        className={"img " + this.props.className}
-        sizes={sizes}
-        src={url}
-        srcSet={srcset}
+      <Image
+        style={{
+          width: this.state.width,
+          height: this.state.height,
+          resizeMode: "contain",
+          backgroundColor: "black"
+        }}
+        source={{ uri }}
       />
     );
   }

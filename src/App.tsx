@@ -1,56 +1,66 @@
-import React, { Component } from "react";
+import React from "react";
+import { StatusBar, StyleSheet, View } from "react-native";
+import { Facebook, ScreenOrientation } from "expo";
 import Carousel from "./Carousel";
-import FBLogin from "./FBLogin";
-import confirmPermissions from "./Perms";
-import "./App.css";
+import Login from "./Login";
+import { saveToken, fetchToken } from "./TokenStore";
 
-const RELOAD_AFTER = 24 * 60 * 60 * 1000; // ms
-
-interface Props {
-  FB: fb.FacebookStatic;
+declare module "expo" {
+  namespace ScreenOrientation {
+    // workaround for missing function, which will be obviated by
+    // https://github.com/expo/expo/issues/2164
+    function allowAsync(orientation: keyof Orientations): Promise<null>;
+  }
 }
 
-class App extends Component<Props> {
-  state = { loggedIn: false };
+export default class App extends React.Component {
+  state = { token: null as string };
 
-  componentDidMount() {
-    this.props.FB.init({
-      appId: "301045530751709",
-      status: true,
-      xfbml: true,
-      version: "v3.2"
-    });
-
-    this.props.FB.AppEvents.logPageView();
-    this.checkLoginStatus();
-
-    setTimeout(() => {
-      document.location.reload(true);
-    }, RELOAD_AFTER);
+  constructor(props) {
+    super(props);
+    ScreenOrientation.allowAsync(
+      ScreenOrientation.Orientation.ALL_BUT_UPSIDE_DOWN
+    );
+    this.fetchToken();
   }
 
-  checkLoginStatus = () => {
-    this.props.FB.getLoginStatus(this.onLogin);
-  };
+  async fetchToken() {
+    const token = await fetchToken();
+    if (token) {
+      this.setState({ token });
+    }
+  }
 
-  onLogin = (response: fb.StatusResponse) => {
-    response.authResponse.grantedScopes;
-    if (response.status === "connected") {
-      confirmPermissions(this.props.FB, hasPermissions => {
-        this.setState({ loggedIn: hasPermissions });
-      });
+  logIn = async (response: Facebook.Response) => {
+    if (response.type === "success") {
+      await saveToken(response.token);
+      this.setState({ token: response.token });
+    } else {
+      // type === 'cancel'
     }
   };
 
   render() {
-    const main = this.state.loggedIn ? (
-      <Carousel FB={this.props.FB} />
+    const body = this.state.token ? (
+      <Carousel token={this.state.token} />
     ) : (
-      <FBLogin checkLoginStatus={this.checkLoginStatus} />
+      <Login onLogin={this.logIn} />
     );
 
-    return <div className="App">{main}</div>;
+    return (
+      <View style={styles.container}>
+        <StatusBar hidden={true} />
+        {body}
+      </View>
+    );
   }
 }
 
-export default App;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center"
+  }
+});

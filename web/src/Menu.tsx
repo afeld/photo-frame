@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 import FullscreenToggle from "./FullscreenToggle";
-import "./Menu.css";
 
 interface Props {
   FB: fb.FacebookStatic;

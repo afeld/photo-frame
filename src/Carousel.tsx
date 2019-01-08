@@ -1,22 +1,16 @@
 import React, { Component } from "react";
-import Fullscreen from "react-full-screen";
-import shuffle from "lodash.shuffle";
+import { shuffle } from "lodash";
 import Img from "./Img";
-import Info from "./Info";
-import Menu from "./Menu";
-import { getFriendsAndPhotos } from "./Photos";
+import { getFriendsAndPhotos, pf } from "./Photos";
 
 interface Props {
-  FB: fb.FacebookStatic;
+  token: string;
 }
 
 interface State {
   currentPhoto?: number;
   friends: pf.User[];
-  isFullscreen: boolean;
-  menuVisible: boolean;
   photos: pf.Photo[];
-  showInfo: boolean;
 }
 
 const DELAY = 30 * 1000; // ms
@@ -25,10 +19,7 @@ export default class Carousel extends Component<Props, State> {
   // https://stackoverflow.com/a/51305453/358804
   state: Readonly<State> = {
     friends: [],
-    isFullscreen: false,
-    menuVisible: true,
-    photos: [],
-    showInfo: false
+    photos: []
   };
 
   componentDidMount() {
@@ -54,8 +45,9 @@ export default class Carousel extends Component<Props, State> {
     this.start();
   };
 
-  fetchPhotos() {
-    getFriendsAndPhotos(this.props.FB, this.onFriendsAndPhotosFetched);
+  async fetchPhotos() {
+    const { friends, photos } = await getFriendsAndPhotos(this.props.token);
+    this.onFriendsAndPhotosFetched(friends, photos);
   }
 
   nextPhotoIndex() {
@@ -84,71 +76,12 @@ export default class Carousel extends Component<Props, State> {
       return null;
     }
     const photo = this.state.photos[this.state.currentPhoto];
-    return <Img photo={photo} />;
-  }
-
-  showInfo = () => {
-    this.setState({ showInfo: true });
-  };
-
-  closeInfo = () => {
-    this.setState({ showInfo: false });
-  };
-
-  toggleMenu = () => {
-    const menuVisible = !this.state.menuVisible;
-    this.setState({ menuVisible });
-    if (menuVisible) {
-      setTimeout(() => {
-        this.setState({ menuVisible: false });
-      }, 3000);
-    }
-  };
-
-  isFullscreen = () => {
-    return this.state.isFullscreen;
-  };
-
-  toggleFullscreen = () => {
-    this.setState({
-      isFullscreen: !this.state.isFullscreen
-    });
-  };
-
-  preloader() {
-    const nextPhotoIndex = this.nextPhotoIndex();
-    if (nextPhotoIndex === undefined) {
-      return null;
-    }
-    const photo = this.state.photos[nextPhotoIndex];
-    return <Img className="preloader" photo={photo} />;
+    // TODO pick size more strategically
+    const img = photo.images[0];
+    return <Img img={img} />;
   }
 
   render() {
-    if (this.state.showInfo) {
-      return <Info closeInfo={this.closeInfo} friends={this.state.friends} />;
-    }
-
-    const menu = this.state.menuVisible ? (
-      <Menu
-        FB={this.props.FB}
-        isFullscreen={this.isFullscreen}
-        showInfo={this.showInfo}
-        toggleFullscreen={this.toggleFullscreen}
-      />
-    ) : null;
-
-    return (
-      <Fullscreen
-        enabled={this.isFullscreen()}
-        onChange={isFullscreen => this.setState({ isFullscreen })}
-      >
-        <div className="carousel" onClick={this.toggleMenu}>
-          {this.img()}
-          {menu}
-          {this.preloader()}
-        </div>
-      </Fullscreen>
-    );
+    return this.img();
   }
 }

@@ -1,8 +1,29 @@
-import flatMap from "lodash.flatmap";
-import uniqBy from "lodash.uniqby";
+import { flatMap, uniqBy, values } from "lodash";
+import fbBatchRequest, { FBBatchResponse } from "./FBAPI";
 
-interface FBBatchResponse {
-  body: string;
+export declare namespace pf {
+  interface Image {
+    height: number;
+    source: string;
+    width: number;
+  }
+
+  interface ProfilePhoto {
+    url: string;
+  }
+
+  interface User {
+    id: string;
+    link: string;
+    name: string;
+    picture: { data: ProfilePhoto };
+  }
+
+  interface Photo {
+    id: string;
+    name?: string;
+    images: Array<Image>;
+  }
 }
 
 interface FBError {
@@ -16,6 +37,10 @@ interface FBErrorResponse {
 
 interface FBBatchOpResponse {
   [userId: string]: PhotosResponse;
+}
+
+interface FriendsResponse {
+  data: pf.User[];
 }
 
 interface PhotosResponse {
@@ -47,74 +72,60 @@ const photosFromBatch = (response: FBBatchResponse) => {
     return [];
   }
   // there is one key+value pair per user
-  const photosResponses = Object.values(json) as PhotosResponse[];
+  const photosResponses = values(json) as PhotosResponse[];
   return flatMap(photosResponses, photosFromUser);
 };
 
 export const onPhotosFetched = (responses: FBBatchResponse[]) => {
   const photos = flatMap(responses, photosFromBatch);
-  return uniqBy(photos, photo => photo.id);
+  return uniqBy(photos, photo => photo.id) as pf.Photo[];
 };
 
-const getFriends = (response: FBBatchResponse): pf.User[] => {
-  const json = JSON.parse(response.body);
+const getFriends = (response: FBBatchResponse) => {
+  const json = JSON.parse(response.body) as FriendsResponse;
   return json.data;
 };
 
-export function getFriendsAndPhotos(
-  FB: fb.FacebookStatic,
-  cb: (friends: pf.User[], photos: pf.Photo[]) => void
-) {
-  const photoFields = "name,webp_images";
-  // batch requests
-  // https://stackoverflow.com/a/16001318/358804
-  // https://developers.facebook.com/docs/graph-api/making-multiple-requests#operations
+export async function getFriendsAndPhotos(token: string) {
+  const photoFields = "name,images";
   // https://developers.facebook.com/docs/graph-api/advanced#largerequests
-  FB.api(
-    "/",
-    "post",
+  const responses = await fbBatchRequest(token, [
     {
-      include_headers: false,
-      batch: [
-        {
-          method: "GET",
-          name: "friends",
-          omit_response_on_success: false,
-          relative_url: "me/friends?fields=id,link,name,picture"
-        },
-
-        // my tagged photos
-        {
-          method: "GET",
-          relative_url: `photos?fields=${photoFields}&ids=me`
-        },
-        // my uploaded photos
-        {
-          method: "GET",
-          relative_url: `photos?type=uploaded&fields=${photoFields}&ids=me`
-        },
-
-        // -- split from requests above so that own photos are retrieved even if user has no friends --
-
-        // others' tagged photos
-        {
-          method: "GET",
-          relative_url: `photos?fields=${photoFields}&ids={result=friends:$.data.*.id}`
-        },
-        // others' uploaded photos
-        {
-          method: "GET",
-          relative_url: `photos?type=uploaded&fields=${photoFields}&ids={result=friends:$.data.*.id}`
-        }
-      ]
+      method: "GET",
+      name: "friends",
+      omit_response_on_success: false,
+      relative_url: "me/friends?fields=id,link,name,picture"
     },
-    (responses: FBBatchResponse[]) => {
-      const friends = getFriends(responses[0]);
 
-      // exclude the friends' response
-      const photoResponses = responses.slice(1) as FBBatchResponse[];
-      const photos = onPhotosFetched(photoResponses);
-      cb(friends, photos);
+    // my tagged photos
+    {
+      method: "GET",
+      relative_url: `photos?fields=${photoFields}&ids=me`
+    },
+    // my uploaded photos
+    {
+      method: "GET",
+      relative_url: `photos?type=uploaded&fields=${photoFields}&ids=me`
+    },
+
+    // -- split from requests above so that own photos are retrieved even if user has no friends --
+
+    // others' tagged photos
+    {
+      method: "GET",
+      relative_url: `photos?fields=${photoFields}&ids={result=friends:$.data.*.id}`
+    },
+    // others' uploaded photos
+    {
+      method: "GET",
+      relative_url: `photos?type=uploaded&fields=${photoFields}&ids={result=friends:$.data.*.id}`
     }
-  );
+  ]);
+  const friends = getFriends(responses[0]);
+
+  // exclude the friends' response
+  const photoResponses = responses.slice(1) as FBBatchResponse[];
+  const photos = onPhotosFetched(photoResponses);
+
+  return { friends, photos };
 }

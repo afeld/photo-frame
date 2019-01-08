@@ -1,6 +1,4 @@
-const { jsWithBabel: tsjPreset } = require("ts-jest/presets");
-
 module.exports = {
-  ...tsjPreset,
+  preset: "jest-expo",
   testPathIgnorePatterns: ["\\.snap$", "node_modules/", "/web/"]
 };
